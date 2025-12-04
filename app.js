@@ -22,7 +22,50 @@ let posts = [
   { id: 2, img: demoImages[1], title: "Realismo lobo", style: "Realismo", caption: "Negro y gris", likes: 98, saved: false },
   { id: 3, img: demoImages[2], title: "Minimal flor", style: "Minimalista", caption: "Líneas finas", likes: 76, saved: false }
 ];
-let accountType = 'Personal';
+const geoCatalog = {
+  'Chile': {
+    'Región Metropolitana': ['Santiago', 'Providencia', 'Ñuñoa'],
+    'Valparaíso': ['Valparaíso', 'Viña del Mar', 'Concón'],
+    'Biobío': ['Concepción', 'Talcahuano', 'Chillán']
+  },
+  'México': {
+    'Ciudad de México': ['CDMX', 'Coyoacán', 'Polanco'],
+    'Jalisco': ['Guadalajara', 'Zapopan', 'Tlaquepaque'],
+    'Nuevo León': ['Monterrey', 'San Pedro', 'Apodaca']
+  },
+  'Argentina': {
+    'Buenos Aires': ['CABA', 'La Plata', 'San Isidro'],
+    'Córdoba': ['Córdoba', 'Villa María', 'Río Cuarto'],
+    'Santa Fe': ['Rosario', 'Santa Fe', 'Rafaela']
+  }
+};
+const settings = {
+  profile: {
+    name: 'Nombre Usuario',
+    email: 'usuario@correo.com',
+    language: 'es-CL',
+    timezone: 'GMT-3',
+    notifications: true,
+    digest: true
+  },
+  discovery: {
+    country: 'Chile',
+    region: 'Región Metropolitana',
+    city: 'Santiago',
+    radius: 25,
+    style: 'Todos',
+    nearby: true,
+    newTalent: true,
+    safe: false
+  },
+  account: {
+    role: 'Tatuador',
+    entryProfile: 'Tatuador',
+    bookings: true,
+    showPortfolio: true,
+    messagesOpen: true
+  }
+};
 
 let idx = 0;
 let liked = false;
@@ -46,7 +89,37 @@ function setIconFilled(btn, on){
   btn.classList.toggle('icon-fill', !!on);
 }
 
+function syncProfileWithSettings(){
+  profile.name = settings.profile.name;
+  profile.location = `${settings.discovery.city}, ${settings.discovery.region}`;
+}
+
+function populateSelect(select, values){
+  if(!select) return;
+  select.innerHTML = '';
+  values.forEach(v=>{
+    const opt = document.createElement('option');
+    opt.value = v; opt.textContent = v; select.appendChild(opt);
+  });
+}
+
+function applyRoleUI(){
+  const badge = document.getElementById('roleBadge');
+  if(badge) badge.textContent = settings.account.role === 'Tatuador' ? 'Tatuador' : 'Usuario';
+  const capability = document.getElementById('roleCapability');
+  if(capability) capability.textContent = settings.account.role === 'Tatuador' ? 'Acepta reservas y gestiona disponibilidad' : 'Descubre artistas y guarda ideas';
+
+  document.querySelectorAll('[data-pro-only]').forEach(el=>{
+    const input = el.querySelector('input');
+    const isArtist = settings.account.role === 'Tatuador';
+    el.classList.toggle('opacity-50', !isArtist);
+    el.classList.toggle('border-dashed', !isArtist);
+    if(input) input.disabled = !isArtist;
+  });
+}
+
 function renderInicio(){
+  syncProfileWithSettings();
   const img = document.getElementById('carouselImg');
   img.src = demoImages[idx % demoImages.length];
   document.getElementById('carouselCounter').textContent = `${(idx%demoImages.length)+1}`;
@@ -157,6 +230,7 @@ function renderGuardados(){
 }
 
 function renderPerfil(){
+  syncProfileWithSettings();
   document.getElementById('perfilNombre').textContent = profile.name;
   document.getElementById('perfilUser').textContent = `@${profile.username} · ${profile.location}`;
   document.getElementById('perfilBio').textContent = profile.bio;
@@ -168,6 +242,60 @@ function renderPerfil(){
     grid.appendChild(card);
   });
   document.getElementById('countPosts').textContent = posts.length;
+  const accountSelect = document.getElementById('accountType');
+  if(accountSelect) accountSelect.value = settings.account.role;
+}
+
+function renderConfig(){
+  const countrySel = document.getElementById('configCountry');
+  const regionSel = document.getElementById('configRegion');
+  const citySel = document.getElementById('configCity');
+
+  populateSelect(countrySel, Object.keys(geoCatalog));
+  countrySel.value = settings.discovery.country;
+
+  const regions = Object.keys(geoCatalog[settings.discovery.country] || {});
+  if(regions.length && !regions.includes(settings.discovery.region)) settings.discovery.region = regions[0];
+  populateSelect(regionSel, regions);
+  regionSel.value = settings.discovery.region;
+
+  const cities = (geoCatalog[settings.discovery.country] || {})[settings.discovery.region] || [];
+  if(cities.length && !cities.includes(settings.discovery.city)) settings.discovery.city = cities[0];
+  populateSelect(citySel, cities);
+  citySel.value = settings.discovery.city;
+
+  document.getElementById('configRadius').value = settings.discovery.radius;
+  document.getElementById('configRadiusValue').textContent = `${settings.discovery.radius} km`;
+  document.getElementById('configStyle').value = settings.discovery.style;
+  document.getElementById('configNearby').checked = settings.discovery.nearby;
+  document.getElementById('configNewTalent').checked = settings.discovery.newTalent;
+  document.getElementById('configSafe').checked = settings.discovery.safe;
+
+  document.getElementById('configName').value = settings.profile.name;
+  document.getElementById('configEmail').value = settings.profile.email;
+  document.getElementById('configLanguage').value = settings.profile.language;
+  document.getElementById('configTimezone').value = settings.profile.timezone;
+  document.getElementById('configNoti').checked = settings.profile.notifications;
+  document.getElementById('configDigest').checked = settings.profile.digest;
+
+  document.getElementById('roleArtist').checked = settings.account.role === 'Tatuador';
+  document.getElementById('roleUser').checked = settings.account.role !== 'Tatuador';
+  document.getElementById('configBookings').checked = settings.account.bookings;
+  document.getElementById('configShowPortfolio').checked = settings.account.showPortfolio;
+  document.getElementById('configMessages').checked = settings.account.messagesOpen;
+
+  document.getElementById('summaryRole').textContent = settings.account.role === 'Tatuador'
+    ? 'Modo profesional: con agenda, solicitudes y portafolio activado.'
+    : 'Modo usuario: inspirarte, guardar ideas y contactar artistas.';
+  document.getElementById('summaryLocation').textContent = `Ves publicaciones desde ${settings.discovery.city}, ${settings.discovery.region} (${settings.discovery.country}).`;
+  document.getElementById('summaryFilters').textContent = `Radio ${settings.discovery.radius} km · Estilo: ${settings.discovery.style} · Preferencias activas: ${[
+    settings.discovery.nearby ? 'cercanía' : null,
+    settings.discovery.newTalent ? 'nuevos talentos' : null,
+    settings.discovery.safe ? 'modo seguro' : null
+  ].filter(Boolean).join(', ') || 'ninguna'}`;
+
+  applyRoleUI();
+  lucide.createIcons();
 }
 
 function initPublish(){
@@ -192,6 +320,61 @@ function initPublish(){
   });
 }
 
+function bindConfigEvents(){
+  const countrySel = document.getElementById('configCountry');
+  const regionSel = document.getElementById('configRegion');
+  const citySel = document.getElementById('configCity');
+  const radius = document.getElementById('configRadius');
+  const styleSel = document.getElementById('configStyle');
+  const nearby = document.getElementById('configNearby');
+  const newTalent = document.getElementById('configNewTalent');
+  const safe = document.getElementById('configSafe');
+
+  const nameInput = document.getElementById('configName');
+  const emailInput = document.getElementById('configEmail');
+  const languageSel = document.getElementById('configLanguage');
+  const timezoneSel = document.getElementById('configTimezone');
+  const noti = document.getElementById('configNoti');
+  const digest = document.getElementById('configDigest');
+
+  if(countrySel) countrySel.addEventListener('change', ()=>{ settings.discovery.country = countrySel.value; renderConfig(); renderInicio(); renderPerfil(); });
+  if(regionSel) regionSel.addEventListener('change', ()=>{ settings.discovery.region = regionSel.value; renderConfig(); renderInicio(); renderPerfil(); });
+  if(citySel) citySel.addEventListener('change', ()=>{ settings.discovery.city = citySel.value; renderConfig(); renderInicio(); renderPerfil(); });
+  if(radius) radius.addEventListener('input', ()=>{ settings.discovery.radius = parseInt(radius.value, 10) || settings.discovery.radius; document.getElementById('configRadiusValue').textContent = `${settings.discovery.radius} km`; });
+  if(radius) radius.addEventListener('change', ()=> renderConfig());
+  if(styleSel) styleSel.addEventListener('change', ()=>{ settings.discovery.style = styleSel.value; renderConfig(); });
+  if(nearby) nearby.addEventListener('change', ()=>{ settings.discovery.nearby = nearby.checked; renderConfig(); });
+  if(newTalent) newTalent.addEventListener('change', ()=>{ settings.discovery.newTalent = newTalent.checked; renderConfig(); });
+  if(safe) safe.addEventListener('change', ()=>{ settings.discovery.safe = safe.checked; renderConfig(); });
+
+  if(nameInput) nameInput.addEventListener('input', ()=>{ settings.profile.name = nameInput.value; renderInicio(); renderPerfil(); });
+  if(emailInput) emailInput.addEventListener('input', ()=>{ settings.profile.email = emailInput.value; });
+  if(languageSel) languageSel.addEventListener('change', ()=>{ settings.profile.language = languageSel.value; });
+  if(timezoneSel) timezoneSel.addEventListener('change', ()=>{ settings.profile.timezone = timezoneSel.value; });
+  if(noti) noti.addEventListener('change', ()=>{ settings.profile.notifications = noti.checked; });
+  if(digest) digest.addEventListener('change', ()=>{ settings.profile.digest = digest.checked; });
+
+  document.querySelectorAll('input[name="accountRole"]').forEach(radio=> radio.addEventListener('change', ()=>{
+    settings.account.role = radio.value;
+    applyRoleUI();
+    renderConfig();
+    renderPerfil();
+  }));
+
+  const bookings = document.getElementById('configBookings');
+  const showPortfolio = document.getElementById('configShowPortfolio');
+  const messages = document.getElementById('configMessages');
+  if(bookings) bookings.addEventListener('change', ()=>{ settings.account.bookings = bookings.checked; });
+  if(showPortfolio) showPortfolio.addEventListener('change', ()=>{ settings.account.showPortfolio = showPortfolio.checked; });
+  if(messages) messages.addEventListener('change', ()=>{ settings.account.messagesOpen = messages.checked; });
+
+  const accountSelect = document.getElementById('accountType');
+  if(accountSelect) accountSelect.addEventListener('change', ()=>{ settings.account.role = accountSelect.value; renderConfig(); renderPerfil(); });
+
+  const saveBtn = document.getElementById('configSave');
+  if(saveBtn) saveBtn.addEventListener('click', ()=>{ renderConfig(); renderInicio(); renderPerfil(); });
+}
+
 function switchTab(name){
   document.querySelectorAll('[id^="tab-"]').forEach(sec=>sec.classList.add('hidden'));
   const sec = document.getElementById(`tab-${name}`); if(sec) sec.classList.remove('hidden');
@@ -208,6 +391,7 @@ function switchTab(name){
   if(name==='guardados') renderGuardados();
   if(name==='perfil') renderPerfil();
   if(name==='publicar') initPublish();
+  if(name==='config') renderConfig();
   lucide.createIcons();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -241,24 +425,85 @@ function initApp(){
 
   document.querySelectorAll('.tab-btn').forEach(btn=> btn.addEventListener('click', ()=> switchTab(btn.getAttribute('data-tab'))));
 
+  bindConfigEvents();
+  applyRoleUI();
+  renderConfig();
   switchTab('inicio');
   lucide.createIcons();
 }
 
+function initAuthTabs(){
+  const authTabs = [
+    { btn: document.getElementById('authTabLogin'), form: document.getElementById('loginForm'), title: 'Iniciar sesión', subtitle: 'Accede a tu cuenta para publicar y reservar.' },
+    { btn: document.getElementById('authTabRegister'), form: document.getElementById('registerForm'), title: 'Crear cuenta', subtitle: 'Elige tu rol, crea tu perfil y entra al panel.' }
+  ];
+  authTabs.forEach(tab=>{
+    if(!tab.btn || !tab.form) return;
+    tab.btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      authTabs.forEach(t=>{
+        if(t.form) t.form.classList.toggle('hidden', t!==tab);
+        if(t.btn) t.btn.className = t===tab ? 'rounded-xl bg-white px-3 py-2 text-violet-900 shadow' : 'rounded-xl px-3 py-2 text-violet-600';
+      });
+      const title = document.getElementById('authTitle');
+      const subtitle = document.getElementById('authSubtitle');
+      if(title) title.textContent = tab.title;
+      if(subtitle) subtitle.textContent = tab.subtitle;
+      lucide.createIcons();
+    });
+  });
+}
+
 // Auth
+initAuthTabs();
 document.getElementById('loginForm').addEventListener('submit', (e)=>{
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
+  const sessionRole = (document.querySelector('input[name="loginRole"]:checked') || { value: settings.account.role }).value;
   const error = document.getElementById('loginError');
   const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   if(!okEmail){ error.textContent = 'Ingresa un correo válido'; error.classList.remove('hidden'); return; }
   if(pass.length < 6){ error.textContent = 'La contraseña debe tener al menos 6 caracteres'; error.classList.remove('hidden'); return; }
   error.classList.add('hidden');
+  settings.account.role = sessionRole;
+  settings.account.entryProfile = sessionRole;
   document.getElementById('auth').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   initApp();
 });
+
+document.getElementById('registerForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim() || 'Nuevo usuario';
+  const username = document.getElementById('regUsername').value.trim() || 'nuevo.usuario';
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPassConfirm').value;
+  const role = (document.querySelector('input[name="regRole"]:checked') || { value: settings.account.role }).value;
+  const profileMode = (document.querySelector('input[name="regProfileMode"]:checked') || { value: role }).value;
+  const error = document.getElementById('registerError');
+  const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!okEmail){ error.textContent = 'Ingresa un correo válido'; error.classList.remove('hidden'); return; }
+  if(pass.length < 6){ error.textContent = 'La contraseña debe tener al menos 6 caracteres'; error.classList.remove('hidden'); return; }
+  if(pass !== pass2){ error.textContent = 'Las contraseñas no coinciden'; error.classList.remove('hidden'); return; }
+  error.classList.add('hidden');
+  settings.profile.name = name;
+  profile.name = name;
+  settings.profile.email = email;
+  settings.account.role = profileMode;
+  settings.account.entryProfile = profileMode;
+  profile.username = username.replace(/[^a-zA-Z0-9._-]/g,'') || 'perfil';
+  document.getElementById('auth').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  initApp();
+});
+
+const linkToRegister = document.getElementById('linkToRegister');
+if(linkToRegister) linkToRegister.addEventListener('click', ()=>{ document.getElementById('authTabRegister').click(); });
+
+const linkToLogin = document.getElementById('linkToLogin');
+if(linkToLogin) linkToLogin.addEventListener('click', ()=>{ document.getElementById('authTabLogin').click(); });
 
 document.getElementById('togglePass').addEventListener('click', ()=>{
   const inp = document.getElementById('loginPass');
