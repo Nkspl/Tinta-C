@@ -70,6 +70,7 @@ let idx = 0;
 let liked = false;
 let saved = false;
 let rightOpen = true;
+let currentTab = 'inicio';
 
 let dm = [
   { id: 1, user: "Val", preview: "¿Agenda el viernes?", time: "12:40", thread: [{ from: "Val", text: "Hola, ¿puedes el viernes?" }] },
@@ -375,6 +376,8 @@ function bindConfigEvents(){
 }
 
 function switchTab(name){
+  const isArtist = settings.account.role === 'Tatuador';
+  if(name==='solicitudes' && !isArtist) name = 'inicio';
   document.querySelectorAll('[id^="tab-"]').forEach(sec=>sec.classList.add('hidden'));
   const sec = document.getElementById(`tab-${name}`); if(sec) sec.classList.remove('hidden');
   document.querySelectorAll('.tab-btn').forEach(btn=>{
@@ -393,6 +396,7 @@ function switchTab(name){
   if(name==='config') renderConfig();
   lucide.createIcons();
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  currentTab = name;
 }
 
 function initApp(){
