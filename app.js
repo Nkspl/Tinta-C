@@ -60,7 +60,6 @@ const settings = {
   },
   account: {
     role: 'Tatuador',
-    entryProfile: 'Tatuador',
     bookings: true,
     showPortfolio: true,
     messagesOpen: true
@@ -117,17 +116,6 @@ function applyRoleUI(){
     el.classList.toggle('border-dashed', !isArtist);
     if(input) input.disabled = !isArtist;
   });
-
-  updateSolicitudesVisibility();
-}
-
-function updateSolicitudesVisibility(){
-  const isArtist = settings.account.role === 'Tatuador';
-  const tabBtn = document.querySelector('[data-tab="solicitudes"]');
-  const tabSection = document.getElementById('tab-solicitudes');
-  if(tabBtn) tabBtn.classList.toggle('hidden', !isArtist);
-  if(tabSection) tabSection.classList.toggle('hidden', !isArtist);
-  if(!isArtist && currentTab === 'solicitudes') switchTab('inicio');
 }
 
 function renderInicio(){
