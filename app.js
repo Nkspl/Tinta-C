@@ -60,7 +60,6 @@ const settings = {
   },
   account: {
     role: 'Tatuador',
-    entryProfile: 'Tatuador',
     bookings: true,
     showPortfolio: true,
     messagesOpen: true
