@@ -431,20 +431,78 @@ function initApp(){
   lucide.createIcons();
 }
 
+function initAuthTabs(){
+  const authTabs = [
+    { btn: document.getElementById('authTabLogin'), form: document.getElementById('loginForm'), title: 'Iniciar sesión', subtitle: 'Accede a tu cuenta para publicar y reservar.' },
+    { btn: document.getElementById('authTabRegister'), form: document.getElementById('registerForm'), title: 'Crear cuenta', subtitle: 'Elige tu rol, crea tu perfil y entra al panel.' }
+  ];
+  authTabs.forEach(tab=>{
+    if(!tab.btn || !tab.form) return;
+    tab.btn.addEventListener('click', (e)=>{
+      e.preventDefault();
+      authTabs.forEach(t=>{
+        if(t.form) t.form.classList.toggle('hidden', t!==tab);
+        if(t.btn) t.btn.className = t===tab ? 'rounded-xl bg-white px-3 py-2 text-violet-900 shadow' : 'rounded-xl px-3 py-2 text-violet-600';
+      });
+      const title = document.getElementById('authTitle');
+      const subtitle = document.getElementById('authSubtitle');
+      if(title) title.textContent = tab.title;
+      if(subtitle) subtitle.textContent = tab.subtitle;
+      lucide.createIcons();
+    });
+  });
+}
+
 // Auth
+initAuthTabs();
 document.getElementById('loginForm').addEventListener('submit', (e)=>{
   e.preventDefault();
   const email = document.getElementById('loginEmail').value.trim();
   const pass = document.getElementById('loginPass').value;
+  const sessionRole = (document.querySelector('input[name="loginRole"]:checked') || { value: settings.account.role }).value;
   const error = document.getElementById('loginError');
   const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   if(!okEmail){ error.textContent = 'Ingresa un correo válido'; error.classList.remove('hidden'); return; }
   if(pass.length < 6){ error.textContent = 'La contraseña debe tener al menos 6 caracteres'; error.classList.remove('hidden'); return; }
   error.classList.add('hidden');
+  settings.account.role = sessionRole;
+  settings.account.entryProfile = sessionRole;
   document.getElementById('auth').classList.add('hidden');
   document.getElementById('app').classList.remove('hidden');
   initApp();
 });
+
+document.getElementById('registerForm').addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const name = document.getElementById('regName').value.trim() || 'Nuevo usuario';
+  const username = document.getElementById('regUsername').value.trim() || 'nuevo.usuario';
+  const email = document.getElementById('regEmail').value.trim();
+  const pass = document.getElementById('regPass').value;
+  const pass2 = document.getElementById('regPassConfirm').value;
+  const role = (document.querySelector('input[name="regRole"]:checked') || { value: settings.account.role }).value;
+  const profileMode = (document.querySelector('input[name="regProfileMode"]:checked') || { value: role }).value;
+  const error = document.getElementById('registerError');
+  const okEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  if(!okEmail){ error.textContent = 'Ingresa un correo válido'; error.classList.remove('hidden'); return; }
+  if(pass.length < 6){ error.textContent = 'La contraseña debe tener al menos 6 caracteres'; error.classList.remove('hidden'); return; }
+  if(pass !== pass2){ error.textContent = 'Las contraseñas no coinciden'; error.classList.remove('hidden'); return; }
+  error.classList.add('hidden');
+  settings.profile.name = name;
+  profile.name = name;
+  settings.profile.email = email;
+  settings.account.role = profileMode;
+  settings.account.entryProfile = profileMode;
+  profile.username = username.replace(/[^a-zA-Z0-9._-]/g,'') || 'perfil';
+  document.getElementById('auth').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  initApp();
+});
+
+const linkToRegister = document.getElementById('linkToRegister');
+if(linkToRegister) linkToRegister.addEventListener('click', ()=>{ document.getElementById('authTabRegister').click(); });
+
+const linkToLogin = document.getElementById('linkToLogin');
+if(linkToLogin) linkToLogin.addEventListener('click', ()=>{ document.getElementById('authTabLogin').click(); });
 
 document.getElementById('togglePass').addEventListener('click', ()=>{
   const inp = document.getElementById('loginPass');
