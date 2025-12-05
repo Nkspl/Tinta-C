@@ -345,6 +345,17 @@
             </div>
           </div>
         </div>
+
+        <div class="mt-4 space-y-3 rounded-3xl border border-violet-200 bg-white p-4 card">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              <div class="text-xs font-semibold uppercase tracking-wide text-violet-700">Resultados filtrados</div>
+              <p class="text-sm text-slate-600">Aplicamos país, región, ciudad, radio, tipo, estilo y disponibilidad.</p>
+            </div>
+            <span id="searchResultsCount" class="rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold text-violet-700">0 resultados</span>
+          </div>
+          <div id="searchResults" class="grid gap-3 md:grid-cols-2"></div>
+        </div>
       </section>
 
       <section id="tab-reservados" class="hidden order-1 md:order-2 md:col-span-10">
