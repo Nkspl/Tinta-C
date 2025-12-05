@@ -22,20 +22,6 @@ let posts = [
   { id: 2, img: demoImages[1], title: "Realismo lobo", style: "Realismo", caption: "Negro y gris", likes: 98, saved: false },
   { id: 3, img: demoImages[2], title: "Minimal flor", style: "Minimalista", caption: "Líneas finas", likes: 76, saved: false }
 ];
-const tattooerFeed = [
-  { id: 'f1', title: 'Flash rosa neo-trad', artist: 'Valeria Ink', style: 'Neo-trad', city: 'Santiago', country: 'Chile', distance: 3, availability: 'Próximos 7 días', img: demoImages[0] },
-  { id: 'f2', title: 'Realismo lobo gris', artist: 'Diego Arte', style: 'Realismo', city: 'Providencia', country: 'Chile', distance: 6, availability: 'Agenda abierta', img: demoImages[1] },
-  { id: 'f3', title: 'Minimalista luna', artist: 'Meli Studio', style: 'Minimalista', city: 'Ñuñoa', country: 'Chile', distance: 4, availability: 'Este mes', img: demoImages[2] },
-  { id: 'f4', title: 'Blackwork botánico', artist: 'InkLab MX', style: 'Blackwork', city: 'CDMX', country: 'México', distance: 2, availability: 'Agenda abierta', img: demoImages[0] },
-  { id: 'f5', title: 'Geométrico color', artist: 'Jalisco Ink', style: 'Neo-trad', city: 'Guadalajara', country: 'México', distance: 8, availability: 'Próximos 7 días', img: demoImages[1] },
-  { id: 'f6', title: 'Linework fino', artist: 'Río Tattoo', style: 'Linework', city: 'Córdoba', country: 'Argentina', distance: 7, availability: 'Este mes', img: demoImages[2] },
-  { id: 'f7', title: 'Tradicional ave', artist: 'Sol Studio', style: 'Tradicional', city: 'Valparaíso', country: 'Chile', distance: 10, availability: 'Agenda abierta', img: demoImages[0] },
-  { id: 'f8', title: 'Botánico color', artist: 'Norte Ink', style: 'Realismo', city: 'CDMX', country: 'México', distance: 5, availability: 'Próximos 7 días', img: demoImages[1] },
-  { id: 'f9', title: 'Fine line flor', artist: 'Estudio Ñuñoa', style: 'Linework', city: 'Ñuñoa', country: 'Chile', distance: 2, availability: 'Este mes', img: demoImages[2] },
-  { id: 'f10', title: 'Minimal animal', artist: 'Cami Tattoo', style: 'Minimalista', city: 'CABA', country: 'Argentina', distance: 6, availability: 'Próximos 7 días', img: demoImages[0] },
-  { id: 'f11', title: 'Neo-trad koi', artist: 'Estudio Centro', style: 'Neo-trad', city: 'Concepción', country: 'Chile', distance: 9, availability: 'Agenda abierta', img: demoImages[1] },
-  { id: 'f12', title: 'Realismo retrato', artist: 'Val Ink', style: 'Realismo', city: 'Santiago', country: 'Chile', distance: 1, availability: 'Próximos 7 días', img: demoImages[2] }
-];
 const searchCatalog = [
   { id: 'r1', title: 'Flash neo-trad zorro', artist: 'Valeria Ink', type: 'Tatuajes', style: 'Neo-trad', country: 'Chile', region: 'Región Metropolitana', city: 'Santiago', distance: 4, availability: 'Próximos 7 días', date: '2024-11-04', remote: false, verified: true },
   { id: 'r2', title: 'Estudio Providencia', artist: 'Estudio Norte', type: 'Artistas', style: 'Realismo', country: 'Chile', region: 'Región Metropolitana', city: 'Providencia', distance: 7, availability: 'Agenda abierta', date: '2024-11-15', remote: true, verified: true },
@@ -81,8 +67,8 @@ const settings = {
     safe: false
   },
   account: {
-    role: 'Usuario',
-    entryProfile: 'Usuario',
+    role: 'Tatuador',
+    entryProfile: 'Tatuador',
     bookings: true,
     showPortfolio: true,
     messagesOpen: true
@@ -104,9 +90,6 @@ const defaultFilters = () => ({
 });
 
 let searchFilters = defaultFilters();
-let feedLoaded = 0;
-const FEED_BATCH = 4;
-let feedObserver;
 
 let idx = 0;
 let liked = false;
@@ -220,6 +203,8 @@ function filterChip(label){
 function updateFilterSummary(){
   const wrap = document.getElementById('activeFilters');
   const chips = document.getElementById('filterChips');
+  if(!wrap || !chips) return;
+  chips.innerHTML = '';
   const defaults = defaultFilters();
   const entries = [];
   entries.push(`${searchFilters.city}, ${searchFilters.region} (${searchFilters.country})`);
@@ -231,14 +216,10 @@ function updateFilterSummary(){
   if(searchFilters.remote) entries.push('Remoto disponible');
   if(searchFilters.verified) entries.push('Solo verificados');
 
-  if(chips){
-    chips.innerHTML = '';
-    entries.forEach(text=> chips.appendChild(filterChip(text)));
-    lucide.createIcons();
-  }
-
+  entries.forEach(text=> chips.appendChild(filterChip(text)));
   const hasDifferences = Object.keys(defaults).some(k => defaults[k] !== searchFilters[k]);
-  if(wrap) wrap.classList.toggle('hidden', entries.length === 0 || !hasDifferences);
+  wrap.classList.toggle('hidden', entries.length === 0 || !hasDifferences);
+  lucide.createIcons();
   renderSearchResults();
 }
 
@@ -271,6 +252,7 @@ function renderInicio(){
   setIconFilled(document.getElementById('likeBtn'), liked);
   setIconFilled(document.getElementById('saveBtn'), saved);
   lucide.createIcons();
+  renderSearchResults();
 }
 
 function renderCalendar(){
@@ -418,7 +400,7 @@ function renderConfig(){
   document.getElementById('configMessages').checked = settings.account.messagesOpen;
 
   document.getElementById('summaryRole').textContent = settings.account.role === 'Tatuador'
-    ? 'Modo profesional: agenda y portafolio activados.'
+    ? 'Modo profesional: con agenda, solicitudes y portafolio activado.'
     : 'Modo usuario: inspirarte, guardar ideas y contactar artistas.';
   document.getElementById('summaryLocation').textContent = `Ves publicaciones desde ${settings.discovery.city}, ${settings.discovery.region} (${settings.discovery.country}).`;
   document.getElementById('summaryFilters').textContent = `Radio ${settings.discovery.radius} km · Estilo: ${settings.discovery.style} · Preferencias activas: ${[
@@ -544,88 +526,8 @@ function renderSearchResults(){
     grid.appendChild(card);
   });
   lucide.createIcons();
-}
-
-function feedCard(post){
-  const card = document.createElement('article');
-  card.className = 'overflow-hidden rounded-2xl border border-violet-100 shadow-sm transition hover:-translate-y-0.5 hover:border-violet-200';
-  card.innerHTML = `
-    <div class="relative aspect-[16/10]">
-      <img src="${post.img}" alt="${post.title}" class="h-full w-full object-cover" />
-      <div class="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
-      <button class="absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/90 card"><i data-lucide="bookmark" class="h-4 w-4"></i></button>
-    </div>
-    <div class="space-y-2 p-4">
-      <div class="flex items-center justify-between">
-        <div class="text-sm font-semibold text-violet-900">${post.title}</div>
-        <span class="rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold text-violet-700">${post.style}</span>
-      </div>
-      <div class="flex flex-wrap items-center gap-2 text-xs text-slate-600">
-        <span class="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-1"><i data-lucide="user" class="h-3.5 w-3.5 text-violet-600"></i>${post.artist}</span>
-        <span class="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-1"><i data-lucide="map-pin" class="h-3.5 w-3.5 text-violet-600"></i>${post.city}, ${post.country}</span>
-        <span class="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-1"><i data-lucide="locate" class="h-3.5 w-3.5 text-violet-600"></i>${post.distance} km</span>
-        <span class="inline-flex items-center gap-1 rounded-full bg-slate-50 px-2 py-1"><i data-lucide="calendar" class="h-3.5 w-3.5 text-violet-600"></i>${post.availability}</span>
-      </div>
-      <div class="flex items-center justify-between text-xs text-slate-600">
-        <div class="flex items-center gap-2">
-          <span class="inline-grid h-8 w-8 place-items-center rounded-full bg-violet-100 text-xs font-semibold text-violet-800">${post.artist[0]}</span>
-          <div>
-            <div class="font-semibold text-slate-800">${post.artist}</div>
-            <div class="text-[11px] text-slate-500">Publicación destacada</div>
-          </div>
-        </div>
-        <button class="rounded-lg bg-violet-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-violet-700">Reservar</button>
-      </div>
-    </div>
-  `;
-  return card;
-}
-
-function updateFeedCounter(){
-  const counter = document.getElementById('feedCounter');
-  if(!counter) return;
-  counter.textContent = `${feedLoaded} de ${tattooerFeed.length} publicaciones`;
-}
-
-function updateFeedStatus(){
-  const status = document.getElementById('feedStatus');
-  if(!status) return;
-  if(feedLoaded >= tattooerFeed.length){
-    status.textContent = 'Has visto todas las publicaciones disponibles.';
-  } else {
-    status.textContent = 'Desliza para seguir viendo más trabajos.';
-  }
-}
-
-function appendFeedBatch(){
-  const list = document.getElementById('tattooerFeed');
-  if(!list) return;
-  if(feedLoaded >= tattooerFeed.length){ updateFeedStatus(); return; }
-  const next = tattooerFeed.slice(feedLoaded, feedLoaded + FEED_BATCH);
-  next.forEach(post => list.appendChild(feedCard(post)));
-  feedLoaded += next.length;
-  updateFeedCounter();
-  updateFeedStatus();
+  applyRoleUI();
   lucide.createIcons();
-}
-
-function resetFeed(){
-  const list = document.getElementById('tattooerFeed');
-  if(!list) return;
-  list.innerHTML = '';
-  feedLoaded = 0;
-  appendFeedBatch();
-}
-
-function initInfiniteFeed(){
-  const sentinel = document.getElementById('feedSentinel');
-  resetFeed();
-  if(feedObserver) feedObserver.disconnect();
-  if(!sentinel) return;
-  feedObserver = new IntersectionObserver(entries => {
-    if(entries.some(e => e.isIntersecting)) appendFeedBatch();
-  }, { rootMargin: '200px' });
-  feedObserver.observe(sentinel);
 }
 
 function initPublish(){
@@ -761,7 +663,6 @@ function initApp(){
   bindConfigEvents();
   bindFilterPanel();
   applyRoleUI();
-  initInfiniteFeed();
   renderConfig();
   switchTab('inicio');
   lucide.createIcons();
