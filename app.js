@@ -526,6 +526,8 @@ function renderSearchResults(){
     grid.appendChild(card);
   });
   lucide.createIcons();
+  applyRoleUI();
+  lucide.createIcons();
 }
 
 function initPublish(){
