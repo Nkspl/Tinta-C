@@ -60,28 +60,11 @@ const settings = {
   },
   account: {
     role: 'Tatuador',
-    entryProfile: 'Tatuador',
     bookings: true,
     showPortfolio: true,
     messagesOpen: true
   }
 };
-
-const defaultFilters = () => ({
-  country: settings.discovery.country,
-  region: settings.discovery.region,
-  city: settings.discovery.city,
-  radius: settings.discovery.radius,
-  type: 'Tatuajes',
-  style: 'Todos',
-  availability: 'Próximos 7 días',
-  from: '',
-  to: '',
-  remote: false,
-  verified: false
-});
-
-let searchFilters = defaultFilters();
 
 let idx = 0;
 let liked = false;
@@ -133,94 +116,6 @@ function applyRoleUI(){
     el.classList.toggle('border-dashed', !isArtist);
     if(input) input.disabled = !isArtist;
   });
-
-  updateSolicitudesVisibility();
-}
-
-function updateSolicitudesVisibility(){
-  const isArtist = settings.account.role === 'Tatuador';
-  const tabBtn = document.querySelector('[data-tab="solicitudes"]');
-  const tabSection = document.getElementById('tab-solicitudes');
-  if(tabBtn) tabBtn.classList.toggle('hidden', !isArtist);
-  if(tabSection) tabSection.classList.toggle('hidden', !isArtist);
-  if(!isArtist && currentTab === 'solicitudes') switchTab('inicio');
-}
-
-function renderFilterForm(){
-  const countrySel = document.getElementById('filterCountry');
-  const regionSel = document.getElementById('filterRegion');
-  const citySel = document.getElementById('filterCity');
-  populateSelect(countrySel, Object.keys(geoCatalog));
-  if(countrySel){
-    if(!geoCatalog[searchFilters.country]) searchFilters.country = Object.keys(geoCatalog)[0];
-    countrySel.value = searchFilters.country;
-  }
-  const regions = Object.keys(geoCatalog[searchFilters.country] || {});
-  if(regions.length && !regions.includes(searchFilters.region)) searchFilters.region = regions[0];
-  populateSelect(regionSel, regions);
-  if(regionSel) regionSel.value = searchFilters.region;
-  const cities = (geoCatalog[searchFilters.country] || {})[searchFilters.region] || [];
-  if(cities.length && !cities.includes(searchFilters.city)) searchFilters.city = cities[0];
-  populateSelect(citySel, cities);
-  if(citySel) citySel.value = searchFilters.city;
-
-  const radius = document.getElementById('filterRadius');
-  const radiusVal = document.getElementById('filterRadiusValue');
-  if(radius){ radius.value = searchFilters.radius; }
-  if(radiusVal){ radiusVal.textContent = `${searchFilters.radius} km`; }
-
-  const typeSel = document.getElementById('filterType');
-  if(typeSel) typeSel.value = searchFilters.type;
-  const styleSel = document.getElementById('filterStyle');
-  if(styleSel) styleSel.value = searchFilters.style;
-  const availSel = document.getElementById('filterAvailability');
-  if(availSel) availSel.value = searchFilters.availability;
-  const from = document.getElementById('filterFrom');
-  if(from) from.value = searchFilters.from;
-  const to = document.getElementById('filterTo');
-  if(to) to.value = searchFilters.to;
-  const remote = document.getElementById('filterRemote');
-  if(remote) remote.checked = searchFilters.remote;
-  const verified = document.getElementById('filterVerified');
-  if(verified) verified.checked = searchFilters.verified;
-}
-
-function filterChip(label){
-  const chip = document.createElement('span');
-  chip.className = 'inline-flex items-center gap-2 rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-[11px] font-semibold text-violet-800';
-  chip.textContent = label;
-  return chip;
-}
-
-function updateFilterSummary(){
-  const wrap = document.getElementById('activeFilters');
-  const chips = document.getElementById('filterChips');
-  if(!wrap || !chips) return;
-  chips.innerHTML = '';
-  const defaults = defaultFilters();
-  const entries = [];
-  entries.push(`${searchFilters.city}, ${searchFilters.region} (${searchFilters.country})`);
-  entries.push(`Radio ${searchFilters.radius} km`);
-  entries.push(searchFilters.type);
-  if(searchFilters.style && searchFilters.style !== 'Todos') entries.push(`Estilo ${searchFilters.style}`);
-  if(searchFilters.availability) entries.push(searchFilters.availability);
-  if(searchFilters.from || searchFilters.to) entries.push(`Fechas ${searchFilters.from || '—'} a ${searchFilters.to || '—'}`);
-  if(searchFilters.remote) entries.push('Remoto disponible');
-  if(searchFilters.verified) entries.push('Solo verificados');
-
-  entries.forEach(text=> chips.appendChild(filterChip(text)));
-  const hasDifferences = Object.keys(defaults).some(k => defaults[k] !== searchFilters[k]);
-  wrap.classList.toggle('hidden', entries.length === 0 || !hasDifferences);
-  lucide.createIcons();
-}
-
-function syncFiltersWithDiscovery(){
-  searchFilters.country = settings.discovery.country;
-  searchFilters.region = settings.discovery.region;
-  searchFilters.city = settings.discovery.city;
-  searchFilters.radius = settings.discovery.radius;
-  renderFilterForm();
-  updateFilterSummary();
 }
 
 function renderInicio(){
@@ -399,57 +294,8 @@ function renderConfig(){
     settings.discovery.safe ? 'modo seguro' : null
   ].filter(Boolean).join(', ') || 'ninguna'}`;
 
-  syncFiltersWithDiscovery();
   applyRoleUI();
   lucide.createIcons();
-}
-
-function bindFilterPanel(){
-  const toggle = document.getElementById('filterToggle');
-  const close = document.getElementById('filterClose');
-  const panel = document.getElementById('filterPanel');
-  const reset = document.getElementById('filterReset');
-  const apply = document.getElementById('filterApply');
-  const clearFromSummary = document.getElementById('filtersClearFromSummary');
-
-  const countrySel = document.getElementById('filterCountry');
-  const regionSel = document.getElementById('filterRegion');
-  const citySel = document.getElementById('filterCity');
-  const radius = document.getElementById('filterRadius');
-  const typeSel = document.getElementById('filterType');
-  const styleSel = document.getElementById('filterStyle');
-  const availabilitySel = document.getElementById('filterAvailability');
-  const from = document.getElementById('filterFrom');
-  const to = document.getElementById('filterTo');
-  const remote = document.getElementById('filterRemote');
-  const verified = document.getElementById('filterVerified');
-
-  const closePanel = ()=> panel && panel.classList.add('hidden');
-  const openPanel = ()=>{ if(panel) panel.classList.remove('hidden'); renderFilterForm(); };
-
-  if(toggle) toggle.addEventListener('click', ()=>{ panel?.classList.contains('hidden') ? openPanel() : closePanel(); });
-  if(close) close.addEventListener('click', closePanel);
-
-  if(countrySel) countrySel.addEventListener('change', ()=>{ searchFilters.country = countrySel.value; renderFilterForm(); updateFilterSummary(); });
-  if(regionSel) regionSel.addEventListener('change', ()=>{ searchFilters.region = regionSel.value; renderFilterForm(); updateFilterSummary(); });
-  if(citySel) citySel.addEventListener('change', ()=>{ searchFilters.city = citySel.value; updateFilterSummary(); });
-  if(radius) radius.addEventListener('input', ()=>{ searchFilters.radius = parseInt(radius.value, 10) || searchFilters.radius; const label=document.getElementById('filterRadiusValue'); if(label) label.textContent = `${searchFilters.radius} km`; });
-  if(radius) radius.addEventListener('change', ()=>{ updateFilterSummary(); });
-  if(typeSel) typeSel.addEventListener('change', ()=>{ searchFilters.type = typeSel.value; updateFilterSummary(); });
-  if(styleSel) styleSel.addEventListener('change', ()=>{ searchFilters.style = styleSel.value; updateFilterSummary(); });
-  if(availabilitySel) availabilitySel.addEventListener('change', ()=>{ searchFilters.availability = availabilitySel.value; updateFilterSummary(); });
-  if(from) from.addEventListener('change', ()=>{ searchFilters.from = from.value; updateFilterSummary(); });
-  if(to) to.addEventListener('change', ()=>{ searchFilters.to = to.value; updateFilterSummary(); });
-  if(remote) remote.addEventListener('change', ()=>{ searchFilters.remote = remote.checked; updateFilterSummary(); });
-  if(verified) verified.addEventListener('change', ()=>{ searchFilters.verified = verified.checked; updateFilterSummary(); });
-
-  if(reset) reset.addEventListener('click', ()=>{ searchFilters = defaultFilters(); renderFilterForm(); updateFilterSummary(); });
-  if(clearFromSummary) clearFromSummary.addEventListener('click', ()=>{ searchFilters = defaultFilters(); renderFilterForm(); updateFilterSummary(); });
-
-  if(apply) apply.addEventListener('click', ()=>{ updateFilterSummary(); closePanel(); });
-
-  renderFilterForm();
-  updateFilterSummary();
 }
 
 function initPublish(){
@@ -583,7 +429,6 @@ function initApp(){
   document.querySelectorAll('.tab-btn').forEach(btn=> btn.addEventListener('click', ()=> switchTab(btn.getAttribute('data-tab'))));
 
   bindConfigEvents();
-  bindFilterPanel();
   applyRoleUI();
   renderConfig();
   switchTab('inicio');
