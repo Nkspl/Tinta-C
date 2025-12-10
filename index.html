@@ -346,18 +346,24 @@
           </div>
         </div>
 
-        <div class="mt-4 space-y-3 rounded-3xl border border-violet-200 bg-white p-4 card">
+
+       <!--seccion resultados filtrados... (campo a borrar esta mal ubicado en el inicio).......................................................-->
+       
+<div class="mt-4 space-y-3 rounded-3xl border border-violet-200 bg-white p-4 card">
           <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
-              <div class="text-xs font-semibold uppercase tracking-wide text-violet-700">Resultados filtrados</div>
-              <p class="text-sm text-slate-600">Aplicamos país, región, ciudad, radio, tipo, estilo y disponibilidad.</p>
+              <div class="text-xs font-semibold uppercase tracking-wide text-violet-700">Publicaciones de tatuadores</div>
+              <p class="text-sm text-slate-600">Explora el feed continuo de artistas y estudios.</p>
             </div>
-            <span id="searchResultsCount" class="rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold text-violet-700">0 resultados</span>
+            <span id="feedCounter" class="rounded-full bg-violet-50 px-3 py-1 text-[11px] font-semibold text-violet-700">0 publicaciones</span>
           </div>
-          <div id="searchResults" class="grid gap-3 md:grid-cols-2"></div>
+          <div id="tattooerFeed" class="space-y-3"></div>
+          <div id="feedStatus" class="text-center text-xs text-slate-500"></div>
+          <div id="feedSentinel" class="h-2"></div>
         </div>
       </section>
 
+<!-- vseccion reservados..................................................................................................................................-->
       <section id="tab-reservados" class="hidden order-1 md:order-2 md:col-span-10">
         <div class="rounded-3xl border border-violet-200 bg-white p-4 card">
           <div class="mb-4 flex items-center justify-between">
@@ -381,6 +387,9 @@
         </div>
       </section>
 
+
+<!-- seccion Favoritos -->
+
       <section id="tab-favoritos" class="hidden order-1 md:order-2 md:col-span-10">
         <div class="rounded-3xl border border-violet-200 bg-white p-4 card">
           <h2 class="mb-4 text-base font-semibold text-violet-900">Favoritos</h2>
@@ -388,6 +397,7 @@
         </div>
       </section>
 
+<!-- seccion  solicitudes-->
       <section id="tab-solicitudes" class="hidden order-1 md:order-2 md:col-span-10">
         <div class="rounded-3xl border border-violet-200 bg-white p-4 card">
           <h2 class="mb-4 text-base font-semibold text-violet-900">Solicitudes</h2>
@@ -395,6 +405,8 @@
         </div>
       </section>
 
+
+<!-- Seccion Mensajes-->
       <section id="tab-mensajes" class="hidden order-1 md:order-2 md:col-span-10">
         <div class="rounded-3xl border border-violet-200 bg-white p-4 card">
           <h2 class="mb-4 text-base font-semibold text-violet-900">Mensajes</h2>
@@ -413,12 +425,16 @@
         </div>
       </section>
 
+     <!-- seccion guardados--> 
+
       <section id="tab-guardados" class="hidden order-1 md:order-2 md:col-span-10">
         <div class="rounded-3xl border border-violet-200 bg-white p-4 card">
           <h2 class="mb-4 text-base font-semibold text-violet-900">Guardados</h2>
           <div id="guardadosGrid" class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4"></div>
         </div>
       </section>
+
+<!-- // seccion perfil usuario--> 
 
       <section id="tab-perfil" class="hidden order-1 md:order-2 md:col-span-10">
         <div class="rounded-3xl border border-violet-200 bg-white p-4 card">
@@ -448,6 +464,8 @@
           <div id="perfilPosts" class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
         </div>
       </section>
+
+<!-- // seccion publicar trabajo--> 
 
       <section id="tab-publicar" class="hidden order-1 md:order-2 md:col-span-10">
         <form id="publishForm" class="rounded-3xl border border-violet-200 bg-white p-4 card">
@@ -546,6 +564,8 @@
         </form>
       </section>
 
+
+<!-- // seccion de configuracion..--> 
       <section id="tab-config" class="hidden order-1 md:order-2 md:col-span-10">
         <div class="rounded-3xl border border-violet-200 bg-white p-4 card">
           <h2 class="mb-4 text-base font-semibold text-violet-900">Configuración</h2>
@@ -724,7 +744,7 @@
 
     </main>
 
-    <footer class="mx-auto max-w-7xl px-4 pb-10 pt-4 text-center text-xs text-slate-500">© <span id="year"></span> Tinta · Hecho con 💜 · <a class="underline decoration-dotted" href="#">Términos</a></footer>
+    <footer class="mx-auto max-w-7xl px-4 pb-10 pt-4 text-center text-xs text-slate-500">© <span id="year"></span> Tinta · Hecho por nickens · <a class="underline decoration-dotted" href="#">Términos</a></footer>
 
     <div class="fixed inset-x-0 bottom-5 z-40 mx-auto w-full max-w-2xl px-4 md:hidden">
       <div class="flex items-center gap-2 rounded-2xl border border-violet-200 bg-white p-2 card">

@@ -616,6 +616,7 @@ function switchTab(name){
     const active = btn.getAttribute('data-tab')===name;
     btn.className = `tab-btn group flex w-full items-center gap-3 rounded-xl px-4 py-2 text-sm transition ${active? 'bg-violet-100 text-violet-900':'text-slate-700 hover:bg-violet-50'}`;
     const i = btn.querySelector('i'); if(i){ i.className = `h-4 w-4 ${active? 'text-violet-700':'text-slate-500'}`; }
+ 
   });
   if(name==='inicio') renderInicio();
   if(name==='reservados') renderReservas();
