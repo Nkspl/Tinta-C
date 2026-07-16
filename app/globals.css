@@ -336,7 +336,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .hero-search-box select { width: 100%; border: 0; outline: 0; background: transparent; color: white; font-size: 11px; font-weight: 650; }
 .hero-search-box select option { color: var(--ink); }
 .hero-search-box > div { width: 1px; height: 34px; background: rgba(255,255,255,.14); }
-.hero-search-action { display: grid; width: 49px; height: 49px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: var(--orange); color: white; }
+.hero-search-action { display: grid; width: 49px; height: 49px; flex: 0 0 auto; place-items: center; border: 0; border-radius: 12px; background: var(--orange); color: white; cursor: pointer; }
 .discovery-art { position: relative; overflow: hidden; }
 .art-word { position: absolute; right: -20px; bottom: -23px; color: rgba(255,255,255,.035); font-family: Georgia, serif; font-size: 140px; font-style: italic; font-weight: 800; letter-spacing: -0.08em; }
 .art-ink { position: absolute; border: 1px solid rgba(255,255,255,.12); border-radius: 49% 51% 32% 68% / 41% 37% 63% 59%; transform: rotate(18deg); }

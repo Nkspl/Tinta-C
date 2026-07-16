@@ -323,19 +323,19 @@ function Discover({
             <label><MapPin size={18} /><span><small>Ubicación</small><select value={location} onChange={(event) => setLocation(event.target.value)}><option>Todas las comunas</option><option>Santiago</option><option>Santiago Centro</option><option>Providencia</option><option>Ñuñoa</option><option>San Miguel</option></select></span></label>
             <div />
             <label><Palette size={18} /><span><small>Estilo</small><select value={style} onChange={(event) => setStyle(event.target.value)}>{styleOptions.map((item) => <option key={item}>{item}</option>)}</select></span></label>
-            <span className="hero-search-action" aria-hidden="true"><Search size={20} /></span>
+            <button type="button" className="hero-search-action" aria-label="Ver resultados" onClick={() => document.getElementById("artist-results")?.scrollIntoView({ behavior: "smooth" })}><Search size={20} /></button>
           </div>
         </div>
         <div className="discovery-art">
-          <div className="art-number"><strong>4,9</strong><span>promedio de artistas verificados</span></div>
+          <div className="art-number"><strong>20%</strong><span>anticipo calculado para cada reserva</span></div>
           <div className="art-ink ink-one" />
           <div className="art-ink ink-two" />
           <span className="art-word">TINTA</span>
         </div>
       </section>
 
-      <section>
-        <SectionHeading kicker={`${filtered.length} perfiles disponibles`} title="Artistas recomendados para ti" action={{ label: "Limpiar filtros", onClick: () => { setStyle("Todos"); setLocation("Todas las comunas"); } }} />
+      <section id="artist-results">
+        <SectionHeading kicker={`${filtered.length} ${filtered.length === 1 ? "perfil disponible" : "perfiles disponibles"}`} title="Artistas recomendados para ti" action={{ label: "Limpiar filtros", onClick: () => { setStyle("Todos"); setLocation("Todas las comunas"); } }} />
         {filtered.length > 0 ? (
           <div className="artist-grid">
             {filtered.map((artist) => (
