@@ -34,6 +34,7 @@ body {
 button, input, select, textarea { font: inherit; }
 button { color: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
+a.button, a.icon-button { text-decoration: none; }
 img { display: block; max-width: 100%; }
 button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid rgba(230, 95, 60, 0.28);
@@ -127,6 +128,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .brand-copy strong { font-family: Georgia, "Times New Roman", serif; font-size: 23px; letter-spacing: -0.04em; }
 .brand-copy small { margin-top: 4px; color: var(--muted); font-size: 9px; font-weight: 700; letter-spacing: 0.13em; text-transform: uppercase; }
 .welcome-nav-actions { display: flex; align-items: center; gap: 12px; }
+.secure-login-note { display: inline-flex; align-items: center; gap: 7px; color: var(--green); font-size: 11px; font-weight: 750; }
+.login-actions { align-items: center; }
+.login-actions > small { max-width: 300px; color: var(--muted); font-size: 10px; line-height: 1.5; }
 .demo-pill { display: inline-flex; align-items: center; gap: 7px; color: #5e574f; font-size: 11px; font-weight: 700; }
 .demo-pill > span { width: 7px; height: 7px; border-radius: 50%; background: #3aaa7d; box-shadow: 0 0 0 4px rgba(58, 170, 125, 0.12); }
 .welcome-grid {
@@ -204,6 +208,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 
 /* Application shell */
 .app-shell { display: flex; min-height: 100vh; background: var(--paper); }
+.app-loading { display: flex; min-height: 100vh; align-items: center; justify-content: center; flex-direction: column; gap: 16px; background: var(--paper); }
+.app-loading p { margin: 0; color: var(--muted); font-size: 11px; font-weight: 700; }
+.loading-ring { width: 32px; height: 32px; border: 3px solid var(--paper-deep); border-top-color: var(--orange); border-radius: 50%; animation: loading-spin .8s linear infinite; }
+@keyframes loading-spin { to { transform: rotate(360deg); } }
 .sidebar {
   position: fixed;
   z-index: 50;
@@ -328,7 +336,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .hero-search-box select { width: 100%; border: 0; outline: 0; background: transparent; color: white; font-size: 11px; font-weight: 650; }
 .hero-search-box select option { color: var(--ink); }
 .hero-search-box > div { width: 1px; height: 34px; background: rgba(255,255,255,.14); }
-.hero-search-box > button { display: grid; width: 49px; height: 49px; flex: 0 0 auto; place-items: center; border: 0; border-radius: 12px; background: var(--orange); color: white; cursor: pointer; }
+.hero-search-action { display: grid; width: 49px; height: 49px; flex: 0 0 auto; place-items: center; border-radius: 12px; background: var(--orange); color: white; }
 .discovery-art { position: relative; overflow: hidden; }
 .art-word { position: absolute; right: -20px; bottom: -23px; color: rgba(255,255,255,.035); font-family: Georgia, serif; font-size: 140px; font-style: italic; font-weight: 800; letter-spacing: -0.08em; }
 .art-ink { position: absolute; border: 1px solid rgba(255,255,255,.12); border-radius: 49% 51% 32% 68% / 41% 37% 63% 59%; transform: rotate(18deg); }
@@ -343,6 +351,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .artist-cover { position: relative; height: 185px; overflow: hidden; background: #d8cbbd; }
 .artist-cover::after { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,.05), transparent 50%, rgba(0,0,0,.2)); content: ""; }
 .artist-cover > img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.75) contrast(1.04); transition: transform 500ms ease; }
+.artist-cover-placeholder { display: flex; width: 100%; height: 100%; align-items: center; justify-content: center; flex-direction: column; gap: 9px; background: radial-gradient(circle at 60% 25%, rgba(230,95,60,.22), transparent 32%), linear-gradient(145deg, #2d2722, #5c4136); color: rgba(255,255,255,.82); font-size: 11px; font-weight: 700; }
 .artist-card:hover .artist-cover > img { transform: scale(1.04); }
 .favorite-button { position: absolute; z-index: 2; top: 11px; right: 11px; display: grid; width: 35px; height: 35px; place-items: center; border: 1px solid rgba(255,255,255,.6); border-radius: 50%; background: rgba(255,253,249,.9); color: #554d46; cursor: pointer; backdrop-filter: blur(7px); }
 .favorite-button.active { color: var(--orange); }
@@ -351,6 +360,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .artist-card-body { padding: 15px; }
 .artist-identity { display: flex; align-items: center; gap: 9px; }
 .artist-identity > img { width: 39px; height: 39px; flex: 0 0 auto; border-radius: 11px; object-fit: cover; }
+.artist-initial { display: grid; width: 39px; height: 39px; flex: 0 0 auto; place-items: center; border-radius: 11px; background: #ecd0c2; color: #6f392a; font-family: Georgia, serif; font-size: 18px; font-weight: 700; }
 .artist-identity > div { min-width: 0; flex: 1; }
 .artist-identity h3 { display: flex; margin: 0; align-items: center; gap: 4px; overflow: hidden; font-family: Georgia, serif; font-size: 15px; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
 .artist-identity h3 svg { flex: 0 0 auto; color: var(--orange); }
@@ -410,8 +420,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .booking-main h3 { margin: 7px 0 4px; font-family: Georgia, serif; font-size: 16px; font-weight: 600; }
 .booking-main p { margin: 0; color: var(--muted); font-size: 9px; }
 .booking-price { display: flex; min-width: 140px; flex-direction: column; align-items: flex-end; gap: 4px; }
+.booking-state-note { max-width: 130px; color: var(--muted); font-size: 10px; text-align: right; }
 .booking-price span { color: var(--muted); font-size: 8px; }
 .booking-price strong { font-size: 13px; }
+.booking-price .payment-approved { display: inline-flex; align-items: center; gap: 4px; color: var(--green); font-size: 8px; font-weight: 750; }
+.booking-pay { min-width: 132px; white-space: nowrap; }
+.button:disabled, .send-button:disabled { cursor: not-allowed; opacity: .58; transform: none; }
 .past-bookings { overflow: hidden; border: 1px solid var(--border); border-radius: 16px; background: var(--white); }
 .past-bookings article { display: flex; min-height: 75px; align-items: center; gap: 12px; border-bottom: 1px solid var(--border); padding: 12px 17px; }
 .past-bookings article:last-child { border: 0; }
@@ -420,6 +434,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .past-bookings strong { font-size: 11px; }
 .past-bookings p { margin: 3px 0 0; color: var(--muted); font-size: 9px; }
 .past-bookings button { display: inline-flex; align-items: center; gap: 5px; border: 0; background: transparent; color: var(--orange-dark); font-size: 9px; font-weight: 700; cursor: pointer; }
+.panel-empty { display: flex; min-height: 170px; align-items: center; justify-content: center; flex-direction: column; gap: 7px; padding: 24px; color: var(--muted); text-align: center; }
+.panel-empty svg { color: var(--orange); }
+.panel-empty strong { color: var(--ink); font-size: 11px; }
+.panel-empty span { font-size: 9px; }
 
 /* Messages */
 .messages-layout { display: grid; height: calc(100vh - 136px); min-height: 590px; overflow: hidden; grid-template-columns: 330px 1fr; border: 1px solid var(--border); border-radius: 20px; background: var(--white); box-shadow: var(--shadow-sm); }
@@ -433,6 +451,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .conversation-list > div:last-child { overflow-y: auto; }
 .conversation-list > div:last-child > button { display: flex; width: 100%; height: 78px; align-items: center; gap: 10px; border: 0; border-top: 1px solid #eee8e0; padding: 0 14px; background: transparent; text-align: left; cursor: pointer; }
 .conversation-list > div:last-child > button:hover, .conversation-list > div:last-child > button.active { background: #f6f0e9; }
+.conversation-empty { padding: 24px 16px; color: var(--muted); font-size: 11px; text-align: center; }
 .conversation-avatar { position: relative; flex: 0 0 auto; }
 .conversation-avatar img { width: 43px; height: 43px; border-radius: 12px; object-fit: cover; }
 .conversation-avatar i { position: absolute; right: -2px; bottom: -1px; width: 10px; height: 10px; border: 2px solid var(--white); border-radius: 50%; background: #49a77e; }
@@ -545,7 +564,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .portfolio-grid p { display: flex; margin: 0; align-items: center; gap: 5px; color: #ded6cf; font-size: 8px; }
 
 /* Settings */
-.settings-layout { display: grid; grid-template-columns: 210px 1fr; gap: 18px; }
+.settings-layout { width: min(920px, 100%); margin: 0 auto; }
 .settings-layout > aside { display: flex; align-self: start; flex-direction: column; gap: 4px; border: 1px solid var(--border); border-radius: 15px; padding: 8px; background: var(--white); }
 .settings-layout > aside button { display: flex; height: 42px; align-items: center; gap: 9px; border: 0; border-radius: 9px; padding: 0 10px; background: transparent; color: var(--muted); font-size: 9px; font-weight: 700; text-align: left; cursor: pointer; }
 .settings-layout > aside button.active { background: #f1e6dc; color: var(--orange-dark); }
@@ -575,6 +594,19 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .toggle-field { display: flex; min-height: 62px; align-items: center; justify-content: space-between; border-top: 1px solid #eee8e0; }
 .toggle-field input { width: 38px; height: 21px; accent-color: var(--orange); }
 .settings-save { display: flex; justify-content: flex-end; gap: 8px; padding: 17px 27px; }
+.settings-wide-field { display: flex; margin-top: 17px; flex-direction: column; gap: 8px; }
+.settings-wide-field > span { color: #5d554d; font-size: 10px; font-weight: 700; }
+.settings-wide-field textarea { min-height: 120px; resize: vertical; border: 1px solid var(--border); border-radius: 10px; padding: 12px; outline: 0; background: #fcfaf7; color: var(--ink); font-size: 12px; line-height: 1.55; }
+.settings-wide-field > small { align-self: flex-end; color: var(--muted); font-size: 9px; }
+.style-choice { display: flex; flex-wrap: wrap; gap: 7px; }
+.style-choice button { display: inline-flex; min-height: 36px; align-items: center; gap: 5px; border: 1px solid var(--border); border-radius: 9px; padding: 0 11px; background: #fcfaf7; color: var(--muted); font-size: 10px; font-weight: 700; cursor: pointer; }
+.style-choice button.active { border-color: rgba(230,95,60,.55); background: #fff1ec; color: var(--orange-dark); }
+.settings-status-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.settings-status-grid article { display: flex; min-height: 78px; align-items: center; gap: 12px; border: 1px solid var(--border); border-radius: 12px; padding: 14px; background: #fcfaf7; color: var(--orange-dark); }
+.settings-status-grid article.is-ready { border-color: #b9d9ca; background: #f0f8f4; color: var(--green); }
+.settings-status-grid article > div { display: flex; flex-direction: column; gap: 4px; }
+.settings-status-grid strong { color: var(--ink); font-size: 11px; }
+.settings-status-grid span { color: var(--muted); font-size: 9px; }
 
 /* Dialogs */
 .modal-shell { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 18px; }
@@ -590,6 +622,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .artist-modal-content { padding: 0 25px 22px; }
 .artist-modal-head { display: flex; align-items: center; gap: 13px; }
 .artist-modal-head > img { width: 78px; height: 78px; margin-top: -30px; z-index: 2; border: 5px solid var(--white); border-radius: 20px; object-fit: cover; }
+.artist-modal-head > .artist-initial { width: 78px; height: 78px; margin-top: -30px; z-index: 2; border: 5px solid var(--white); border-radius: 20px; font-size: 30px; }
 .artist-modal-head > div { min-width: 0; flex: 1; padding-top: 13px; }
 .artist-modal-head h2 { display: flex; margin: 0; align-items: center; gap: 5px; font-family: Georgia, serif; font-size: 22px; font-weight: 600; }
 .artist-modal-head h2 svg { color: var(--orange); }
@@ -627,14 +660,27 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
 .booking-total small { color: #afa59d; font-size: 7px; }
 .booking-total strong { font-family: Georgia, serif; font-size: 19px; font-weight: 500; }
 .booking-total p { display: flex; align-items: center; gap: 5px; color: #bfb5ad; font-size: 7px; }
+.booking-total p { max-width: 235px; line-height: 1.45; }
 .booking-total svg { color: #6bd1a3; }
 .booking-modal > footer, .upload-modal > footer { display: flex; justify-content: flex-end; gap: 8px; margin-top: 17px; }
 .upload-drop { position: relative; display: block; height: 240px; overflow: hidden; margin: 18px 0; border: 1px dashed var(--border-strong); border-radius: 14px; cursor: pointer; }
 .upload-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
 .upload-drop img { width: 100%; height: 100%; object-fit: cover; filter: saturate(.75); }
+.upload-drop.is-empty { display: grid; place-items: center; background: #f8f3ed; }
+.upload-drop .upload-placeholder { position: static; display: flex; align-items: center; flex-direction: column; gap: 9px; background: transparent; color: var(--muted); font-size: 10px; backdrop-filter: none; }
 .upload-drop > span { position: absolute; right: 12px; bottom: 12px; display: inline-flex; align-items: center; gap: 6px; border-radius: 9px; padding: 8px 10px; background: rgba(25,21,18,.82); color: white; font-size: 8px; font-weight: 700; backdrop-filter: blur(8px); }
+.form-error { margin: 12px 0 0; border: 1px solid #edc0b4; border-radius: 9px; padding: 9px 11px; background: #fff2ee; color: #9f3d27; font-size: 9px; line-height: 1.45; }
+.payment-return-shell { display: grid; min-height: 100vh; place-items: center; padding: 24px; background: radial-gradient(circle at 50% 18%, rgba(230,95,60,.12), transparent 34%), var(--paper); }
+.payment-return-card { display: flex; width: min(520px, 100%); align-items: center; flex-direction: column; border: 1px solid var(--border); border-radius: 28px; padding: 46px; background: var(--white); text-align: center; box-shadow: var(--shadow-lg); }
+.payment-return-icon { display: grid; width: 64px; height: 64px; margin-bottom: 20px; place-items: center; border-radius: 20px; background: #e8f5ef; color: var(--green); }
+.payment-failure .payment-return-icon { background: #fff0ec; color: var(--orange-dark); }
+.payment-pending .payment-return-icon { background: #f3ebfa; color: var(--purple); }
+.payment-return-card h1 { margin: 11px 0 10px; font-family: Georgia, serif; font-size: 36px; font-weight: 500; }
+.payment-return-card p { max-width: 400px; margin: 0 0 24px; color: var(--muted); font-size: 13px; line-height: 1.7; }
+.payment-return-card > small { margin-top: 18px; color: #9b9188; font-size: 9px; }
 .toast { position: fixed; z-index: 140; right: 25px; bottom: 25px; display: flex; min-height: 52px; align-items: center; gap: 10px; border: 1px solid #3c3732; border-radius: 13px; padding: 8px 16px 8px 8px; background: #25211e; color: white; font-size: 10px; font-weight: 700; box-shadow: var(--shadow-lg); animation: toast-in 220ms ease-out; }
 .toast > span { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 9px; background: #e65f3c; }
+.notification-empty { display: flex; min-height: 110px; align-items: center; justify-content: center; flex-direction: column; gap: 9px; padding: 20px; color: var(--muted); font-size: 11px; text-align: center; }
 @keyframes toast-in { from { opacity: 0; transform: translateY(10px); } }
 
 @media (max-width: 1220px) {
@@ -719,6 +765,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .settings-layout > aside button { min-width: max-content; }
   .form-grid, .booking-form-grid { grid-template-columns: 1fr; }
   .account-choice { grid-template-columns: 1fr; }
+  .settings-status-grid { grid-template-columns: 1fr; }
   .artist-modal-cover { height: 170px; }
   .artist-facts { grid-template-columns: 1fr; }
   .modal-portfolio { height: 130px; }

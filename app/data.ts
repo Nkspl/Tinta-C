@@ -1,5 +1,5 @@
 export type Artist = {
-  id: number;
+  id: string;
   name: string;
   handle: string;
   studio: string;
@@ -19,7 +19,7 @@ export type Artist = {
 
 export const artists: Artist[] = [
   {
-    id: 1,
+    id: "1",
     name: "Camila Reyes",
     handle: "@cami.ink",
     studio: "Casa Nómada",
@@ -41,7 +41,7 @@ export const artists: Artist[] = [
     bio: "Diseños delicados y piezas botánicas creadas a medida. Trabajo con cita previa y una conversación tranquila antes de cada sesión.",
   },
   {
-    id: 2,
+    id: "2",
     name: "Matías Soto",
     handle: "@soto.black",
     studio: "Distrito Ink",
@@ -63,7 +63,7 @@ export const artists: Artist[] = [
     bio: "Blackwork de alto contraste, geometría y proyectos de manga. Cada propuesta se adapta a la anatomía y al movimiento del cuerpo.",
   },
   {
-    id: 3,
+    id: "3",
     name: "Antonia Silva",
     handle: "@antonia.color",
     studio: "Lumbre Tattoo",
@@ -85,7 +85,7 @@ export const artists: Artist[] = [
     bio: "Ilustración vibrante, animales y personajes con una paleta propia. Me interesa transformar referencias personales en piezas únicas.",
   },
   {
-    id: 4,
+    id: "4",
     name: "Diego Fuentes",
     handle: "@fuentes.realism",
     studio: "Taller Sur",
@@ -109,99 +109,43 @@ export const artists: Artist[] = [
 ];
 
 export type Booking = {
-  id: number;
-  artistId: number;
+  id: string;
+  artistId: string;
   artist: string;
   studio: string;
   style: string;
   date: string;
   time: string;
-  status: "Confirmada" | "En revisión" | "Completada";
+  status: "Esperando anticipo" | "Confirmada" | "En revisión" | "Completada" | "Rechazada" | "Reembolsada";
   price: number;
+  depositAmount?: number;
+  paymentStatus?: string;
+  checkoutUrl?: string | null;
+  perspective?: "client" | "artist";
+  client?: string;
+  placement?: string;
+  size?: string;
+  notes?: string;
 };
 
-export const seededBookings: Booking[] = [
-  {
-    id: 1001,
-    artistId: 2,
-    artist: "Matías Soto",
-    studio: "Distrito Ink",
-    style: "Blackwork · antebrazo",
-    date: "19 Jul 2026",
-    time: "15:30",
-    status: "Confirmada",
-    price: 115000,
-  },
-  {
-    id: 1000,
-    artistId: 3,
-    artist: "Antonia Silva",
-    studio: "Lumbre Tattoo",
-    style: "Consulta de diseño",
-    date: "04 Jul 2026",
-    time: "11:00",
-    status: "Completada",
-    price: 25000,
-  },
-];
-
 export type Conversation = {
-  id: number;
+  id: string;
   person: string;
   role: string;
   avatar: string;
   unread: number;
-  messages: { id: number; from: "me" | "them"; text: string; time: string }[];
+  messages: { id: string; from: "me" | "them"; text: string; time: string }[];
 };
 
-export const seededConversations: Conversation[] = [
-  {
-    id: 1,
-    person: "Matías Soto",
-    role: "Distrito Ink",
-    avatar: artists[1].avatar,
-    unread: 2,
-    messages: [
-      { id: 1, from: "them", text: "Hola Nikens, vi las referencias que enviaste. La idea funciona muy bien para el antebrazo.", time: "12:18" },
-      { id: 2, from: "them", text: "Prepararé dos variaciones para que las revisemos antes de la sesión.", time: "12:20" },
-    ],
-  },
-  {
-    id: 2,
-    person: "Camila Reyes",
-    role: "Casa Nómada",
-    avatar: artists[0].avatar,
-    unread: 0,
-    messages: [
-      { id: 1, from: "me", text: "Hola, ¿trabajas diseños botánicos pequeños?", time: "Ayer" },
-      { id: 2, from: "them", text: "Sí, es una de mis especialidades. Envíame tus referencias cuando quieras.", time: "Ayer" },
-    ],
-  },
-  {
-    id: 3,
-    person: "Antonia Silva",
-    role: "Lumbre Tattoo",
-    avatar: artists[2].avatar,
-    unread: 0,
-    messages: [
-      { id: 1, from: "them", text: "Gracias por venir. Dejé cargadas las indicaciones de cuidado en tu reserva.", time: "4 jul" },
-    ],
-  },
-];
+export type PortfolioItem = { id: string; title: string; style: string; image: string; likes: number };
 
-export const initialRequests = [
-  { id: 1, client: "Javiera P.", initials: "JP", concept: "Rama de olivo en fine line", placement: "Antebrazo", budget: "$70.000–$100.000", received: "Hace 18 min", status: "Nueva" },
-  { id: 2, client: "Tomás R.", initials: "TR", concept: "Composición geométrica", placement: "Pantorrilla", budget: "$120.000–$160.000", received: "Hace 2 h", status: "Nueva" },
-  { id: 3, client: "Belén M.", initials: "BM", concept: "Cover-up floral en negro", placement: "Hombro", budget: "$180.000–$240.000", received: "Ayer", status: "Conversando" },
-];
-
-export const portfolioSeed = [
-  { id: 1, title: "Botánica en movimiento", style: "Fine line", image: artists[0].work[0], likes: 284 },
-  { id: 2, title: "Serpiente ornamental", style: "Blackwork", image: artists[1].work[0], likes: 198 },
-  { id: 3, title: "Memoria floral", style: "Botánico", image: artists[0].work[1], likes: 341 },
-  { id: 4, title: "Geometría natural", style: "Geométrico", image: artists[2].work[0], likes: 156 },
-  { id: 5, title: "Retrato de sombra", style: "Black & grey", image: artists[3].work[0], likes: 427 },
-  { id: 6, title: "Línea continua", style: "Minimalista", image: artists[0].work[2], likes: 223 },
+export const portfolioSeed: PortfolioItem[] = [
+  { id: "1", title: "Botánica en movimiento", style: "Fine line", image: artists[0].work[0], likes: 284 },
+  { id: "2", title: "Serpiente ornamental", style: "Blackwork", image: artists[1].work[0], likes: 198 },
+  { id: "3", title: "Memoria floral", style: "Botánico", image: artists[0].work[1], likes: 341 },
+  { id: "4", title: "Geometría natural", style: "Geométrico", image: artists[2].work[0], likes: 156 },
+  { id: "5", title: "Retrato de sombra", style: "Black & grey", image: artists[3].work[0], likes: 427 },
+  { id: "6", title: "Línea continua", style: "Minimalista", image: artists[0].work[2], likes: 223 },
 ];
 
 export const formatClp = (value: number) =>

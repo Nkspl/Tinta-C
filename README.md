@@ -1,108 +1,96 @@
-# vinext-starter
+# Tinta
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+Marketplace full-stack para descubrir artistas del tatuaje en Chile, publicar portafolios, conversar, reservar sesiones y cobrar anticipos en CLP mediante Mercado Pago.
 
-## Prerequisites
+## Funciones principales
 
-- Node.js `>=22.13.0`
-- Linux with `flock`, `curl`, and GNU `timeout`
+- inicio de sesión administrado por ChatGPT/Sites, sin contraseñas almacenadas por Tinta;
+- cuentas con modo cliente y artista;
+- perfiles profesionales configurables;
+- artistas, favoritos, reservas, conversaciones y mensajes persistentes;
+- portafolios con imágenes JPG, PNG o WebP almacenadas en R2;
+- anticipos del 20 % mediante Mercado Pago Checkout Pro;
+- webhooks firmados, verificación de monto y moneda, idempotencia y devolución al rechazar;
+- interfaz responsive y accesible para escritorio, tablet y móvil.
 
-## Sites Lifecycle
+## Tecnologías
 
-The Sites lifecycle CLI runs the locked dependency install before returning this checkout. Edit the source under `app/`, then checkpoint when a coherent milestone is ready to inspect or share. The remote Sites builder runs `npm run build` against the pushed commit. Do not repeat install or build as a normal pre-checkpoint step.
+- TypeScript, React 19 y componentes del App Router de Next.js;
+- Vinext y Vite para ejecutar el proyecto sobre Cloudflare Workers;
+- Cloudflare D1 (SQL/SQLite distribuido) para los datos;
+- Drizzle ORM y migraciones SQL para el esquema;
+- Cloudflare R2 para las imágenes;
+- Mercado Pago Checkout Pro para pagos en CLP;
+- CSS, Tailwind CSS 4 y Lucide React para la interfaz;
+- Node.js Test Runner, TypeScript y ESLint para validación.
 
-This starter does not use `wrangler.jsonc`.
+## Ejecutar en VS Code
 
-`install:ci` is intentionally a single, non-retrying `npm ci`. It refuses a concurrent install for the same project, consumes a matching image-seeded npm cache with `--prefer-offline` while retaining registry fallback for a missing cache object, otherwise downloads and verifies the complete vinext tarball recorded in `package-lock.json`, limits npm to one socket, and terminates a stalled install. `build` applies a short timeout and then validates the Sites artifact. These helpers target Linux and use GNU `timeout`; they are not native macOS scripts.
+### Requisitos
 
-Scripts that need writable project-scoped home, npm, XDG, and temporary paths use `scripts/sites-env.sh`. The `dev` and `start` scripts honor the caller's runtime environment and keep Wrangler logs inside the checkout. The generated `.sites-runtime/` directory is disposable and ignored by Git.
+- Node.js 22.13 o superior;
+- Git;
+- VS Code;
+- en Windows, WSL2 es la opción recomendada para ejecutar también los scripts completos de build.
 
-## Included Shape
+### Instalación
 
-- edit site code under `app/`
-- `app/chatgpt-auth.ts` provides optional dispatch-owned ChatGPT sign-in helpers
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/index.ts` reads the D1 binding from the Cloudflare Worker environment
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+git clone https://github.com/Nkspl/Tinta-C.git
+cd Tinta-C
+npm ci
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+Para desarrollo sin cobros reales no necesitas credenciales. El entorno local usa una identidad de prueba y crea D1/R2 locales mediante Miniflare.
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+Si necesitas probar la creación de preferencias de Mercado Pago, copia el archivo de ejemplo y usa exclusivamente credenciales de prueba:
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+```bash
+cp .env.example .env
+```
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+Completa en `.env`:
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+```dotenv
+MP_ACCESS_TOKEN="TEST-..."
+MP_WEBHOOK_SECRET="..."
+MP_MODE="sandbox"
+```
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+No subas `.env` ni credenciales reales a Git.
 
-## Diagnostic Commands
+### Iniciar
 
-- `npm run install:ci`: perform the one bounded lockfile install
-- `npm run dev`: start the Vite/Vinext development server
-- `npm run build`: build and validate the deployable Sites artifact
-- `npm run start`: start the built Vinext application
-- `npm test`: build, validate, and verify the rendered development-preview metadata
-- `npm run validate:artifact`: recheck an existing artifact's manifest and ESM `default.fetch` export
-- `npm run db:generate`: generate Drizzle migrations after schema changes
+Abre la carpeta en VS Code:
 
-Use build and validation commands for targeted diagnosis after a remote failure, not as part of the normal checkpoint path.
+```bash
+code .
+npm run dev
+```
 
-The timeout defaults can be overridden for a controlled canary with `SITES_INSTALL_TIMEOUT`, `SITES_INSTALL_KILL_AFTER`, `SITES_BUILD_TIMEOUT`, and `SITES_BUILD_KILL_AFTER`. A timeout fails the command; the helpers never retry an unchanged install or build.
+Vite mostrará la URL local en la terminal, normalmente `http://localhost:5173`.
 
-## Learn More
+Los datos locales se guardan bajo `.wrangler/`. Para probar webhooks reales necesitas una URL HTTPS pública; Mercado Pago no puede llamar directamente a `localhost`.
 
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+### Validaciones
+
+```bash
+npm run typecheck
+npm run lint
+npm test
+npm audit --omit=dev
+```
+
+`npm test` ejecuta el typecheck, crea el artefacto de producción y corre las pruebas de rutas y seguridad. Los scripts de build del hosting usan Bash; en Windows ejecútalos dentro de WSL2.
+
+## Configuración de producción
+
+El despliegue necesita los bindings declarados en `.openai/hosting.json`:
+
+- `DB`: base de datos D1;
+- `BUCKET`: bucket R2;
+- `MP_ACCESS_TOKEN`: secreto de Mercado Pago;
+- `MP_WEBHOOK_SECRET`: secreto de firma del webhook;
+- `MP_MODE`: `sandbox` o `production`.
+
+El webhook de producción es `/api/payments/webhook`. Tinta solo habilita el botón de pago cuando están configurados tanto el token como el secreto del webhook.
